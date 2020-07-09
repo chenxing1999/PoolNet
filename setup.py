@@ -12,7 +12,7 @@ def torch_urls(version):
 
 setup(
     name="lib-poolnet",
-    version="v0.2.2",
+    version="v0.0.1",
     description="Ready-to-use Saliency object detection under one common API",
     author="Cinnamon AI Lab",
     url="https://github.com/xing1999/PoolNet",
@@ -22,7 +22,6 @@ setup(
     python_requires=">=3.6",
     install_requires=[torch_urls("1.4"), "numpy"],
     extras_require={
-        "test": ["pytest"],
-        "dev": ["black"],
+        "dev": ["black", "pytest"],
     },
 )
