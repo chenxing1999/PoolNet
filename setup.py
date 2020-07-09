@@ -7,7 +7,7 @@ def torch_urls(version):
     platform_system = platform.system()
     if platform_system == "Windows":
         return f"torch@https://download.pytorch.org/whl/cu90/torch-{version}-cp36-cp36m-win_amd64.whl#"
-    return f"torch=={version}"
+    return f"torch>={version}"
 
 
 setup(
