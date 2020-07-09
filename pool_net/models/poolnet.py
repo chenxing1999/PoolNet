@@ -2,13 +2,27 @@ from torch import nn
 import torch
 from torch.nn import functional as F
 
+from .encoder import Encoder
+from .fam import FeatureAggregation, DeepPoolLayer
+
 
 class VggPoolNet(nn.Module):
     def __init__(self):
         super(VggPoolNet, self).__init__()
-        self.encoder = None
-        self.fams = None
-        self.score = None
+        in_channel = 512
+        out_channels = [512, 256, 128]
+        self.encoder = Encoder(in_channel, out_channels)
+
+        self.fams = nn.ModuleList(
+            [
+                DeepPoolLayer(512, 512),
+                DeepPoolLayer(512, 256),
+                DeepPoolLayer(256, 128),
+            ]
+        )
+
+        self.last_fam = FeatureAggregation(128, 128)
+        self.score = nn.Conv2d(128, 1, 1, 1)
 
     def forward(self, x):
         x_size = x.size()
@@ -18,9 +32,13 @@ class VggPoolNet(nn.Module):
 
         prev = self.fams[0](encoded_feat[0], encoded_feat[1], infos[0])
 
-        for k in range(1, len(conv2merge) - 1):
+        for k in range(1, len(encoded_feat) - 1):
             prev = self.fams[k](prev, encoded_feat[k + 1], infos[k])
 
-        merge = self.fams[-1](prev)
-        merge = self.score(merge, x_size)
+        merge = self.last_fam(prev)
+        merge = self.score(merge)
+
+        merge = F.interpolate(
+            merge, x_size[2:], mode="bilinear", align_corners=True
+        )
         return merge

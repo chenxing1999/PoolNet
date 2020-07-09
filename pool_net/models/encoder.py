@@ -56,7 +56,7 @@ class Encoder(nn.Module):
             infos.append(layer)
         self.infos = nn.ModuleList(infos)
 
-        # Note here original author define init 
+        # Note here original author define init
         # weight. But I use default init of PyTorch
 
     def forward(self, x):
