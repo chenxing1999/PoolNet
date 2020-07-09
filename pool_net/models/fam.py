@@ -23,15 +23,13 @@ class FeatureAggregation(nn.Module):
         res = x
         for layer in self.layers:
             y = layer(x)
-            res = torch.add(
-                y,
-                F.interpolate(
-                    y, x.shape[2:], mode="bilinear", align_corners=True
-                ),
+            res += F.interpolate(
+                y, x.shape[2:], mode="bilinear", align_corners=True
             )
+
         res = F.relu(res)
 
-        if x2:
+        if x2 is not None:
             res = F.interpolate(
                 res, x2.shape[2:], mode="bilinear", align_corners=True
             )

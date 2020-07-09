@@ -75,7 +75,7 @@ class Encoder(nn.Module):
         xs_reverse = xs[::-1]
 
         infos = []
-        for layer, feat in zip(self.infos, xs_reverse):
+        for layer, feat in zip(self.infos, xs_reverse[1:]):
             t = F.interpolate(
                 p_tensor, feat.size()[2:], mode="bilinear", align_corners=True
             )

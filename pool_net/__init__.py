@@ -1,1 +1,1 @@
-import models
+from .models.poolnet import VggPoolNet
