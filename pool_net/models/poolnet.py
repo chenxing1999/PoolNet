@@ -22,12 +22,16 @@ class VggPoolNet(nn.Module):
         )
 
         self.last_fam = FeatureAggregation(128, 128)
-        self.score = nn.Conv2d(128, 1, 1, 1)
+        self.score = nn.Conv2d(128, 1, 1, stride=1)
 
     def forward(self, x):
         x_size = x.size()
+
+        # encoded_feat: list of Encoded feature by VGG
+        # infos: list of P-tensor resized with different size
         encoded_feat, infos = self.encoder(x)
 
+        # Reverse encoded feat list
         encoded_feat = encoded_feat[::-1]
 
         prev = self.fams[0](encoded_feat[0], encoded_feat[1], infos[0])
