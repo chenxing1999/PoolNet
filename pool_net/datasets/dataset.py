@@ -7,8 +7,6 @@ from PIL import Image
 import pandas as pd
 import os
 
-import dataset
-
 
 default_transform = transforms.Compose(
     [
@@ -42,7 +40,7 @@ def load_label(path):
         return label
 
 
-class Dataset(Dataset):
+class myDataset(Dataset):
     def __init__(self, csv_file, data_dir, transform=None):
         # Image directory
         self.data_dir = data_dir
@@ -87,7 +85,7 @@ def get_loader(config, mode="train", pin=False):
         transform = default_transform
 
         data_loader = data.DataLoader(
-            dataset=Dataset(config.train_root, config.train_list, transform),
+            dataset=myDataset(config.train_root, config.train_list, transform),
             batch_size=config.batch_size,
             shuffle=shuffle,
             num_workers=config.num_thread,
@@ -98,7 +96,7 @@ def get_loader(config, mode="train", pin=False):
         transform = default_transform
 
         data_loader = data.DataLoader(
-            dataset=Dataset(config.test_root, config.test_list, transform),
+            dataset=myDataset(config.test_root, config.test_list, transform),
             batch_size=config.batch_size,
             shuffle=shuffle,
             num_workers=config.num_thread,
