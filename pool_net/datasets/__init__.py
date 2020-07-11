@@ -1,2 +1,1 @@
-from.dataset import Dataset, get_loader
-from .transform import *
+from .dataset import myDataset, get_loader
