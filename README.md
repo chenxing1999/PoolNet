@@ -10,6 +10,16 @@ In this project, we re-implement [this paper](https://arxiv.org/abs/1904.09569) 
 #### 3. [Maintainer](#maintainer)
 -----
 
-TBD
+## <div id="#install"> Install </div>
+First, follow the tutorial in [link](https://pytorch.org/) to install PyTorch.
 
+For inference only install:
+``` shell
+# Install master (unstable)
+pip install lib-poolnet@git+ssh://git@github.com:xing1999/PoolNet@master
+```
 
+For modify code, please first clone this repo, then in this folder, run:
+```
+pip install -e .[dev]
+```
