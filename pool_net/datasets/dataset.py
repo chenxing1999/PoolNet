@@ -32,16 +32,20 @@ def load_label(path):
         return None
     else:
         im = Image.open(path)
-        label = np.array(im, dtype=np.float32)
-        if len(label.shape) == 3:
-            label = label[:, :, 0]
-        label = label / 255.0
-        label = label[np.newaxis, ...]
-        return label
+
+        return im
 
 
-class myDataset(Dataset):
-    def __init__(self, csv_file, data_dir, transform=None):
+class MyDataset(Dataset):
+    def __init__(self, csv_file, data_dir, transform=default_transform):
+        """
+        Constructer of MyDataset
+        
+        :param csv_file: the csv file contains all name of images
+        :param data_dir: directory of folder containing all images
+        :param transform: transform function will be used on images
+        :return: returns nothing
+        """
         # Image directory
         self.data_dir = data_dir
         self.csv_file = csv_file
@@ -57,11 +61,20 @@ class myDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
+        """
+        return number of images
+        """
         return self.len
 
     def __getitem__(self, idx):
+        """
+        Getter
+        
+        :param idx: the index of image
+        :return: return the i'th image and its label
+        """
         # Image file path
-        link = self.images_list[item].split()
+        link = self.images_list[idx].split()
         image_name = os.path.join(self.data_dir, link[0])
         gt_name = os.path.join(self.data_dir, link[1])
 
@@ -72,7 +85,7 @@ class myDataset(Dataset):
         # Transform
         if self.transform:
             image = self.transform(image)
-            label = transforms.ToTensor(label)
+            label = transforms.ToTensor()(label)
 
         return image, label
 

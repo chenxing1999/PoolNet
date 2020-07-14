@@ -1,1 +1,1 @@
-from .dataset import myDataset, get_loader
+from .dataset import MyDataset, get_loader
