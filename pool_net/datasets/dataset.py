@@ -4,8 +4,10 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
 from PIL import Image
-import pandas as pd
 import os
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 default_transform = transforms.Compose(
@@ -19,7 +21,7 @@ default_transform = transforms.Compose(
 
 def load_image(path):
     if os.path.exists(path):
-        print(f"File {path} not exists")
+        logger.error(f"File {path} not exists")
         return None
     else:
         im = Image.open(path).convert("RGB")
@@ -28,7 +30,7 @@ def load_image(path):
 
 def load_label(path):
     if os.path.exists(path):
-        print(f"File {path} not exists")
+        logger.error(f"File {path} not exists")
         return None
     else:
         im = Image.open(path)
@@ -37,22 +39,20 @@ def load_label(path):
 
 
 class MyDataset(Dataset):
-    def __init__(self, csv_file, data_dir, transform=default_transform):
+    def __init__(self, flist, data_dir, transform=default_transform):
         """
         Constructer of MyDataset
         
-        :param csv_file: the csv file contains all name of images
+        :param flist: List of image file name and ground truth tuple
         :param data_dir: directory of folder containing all images
         :param transform: transform function will be used on images
         :return: returns nothing
         """
         # Image directory
         self.data_dir = data_dir
-        self.csv_file = csv_file
 
-        # Load the CSV file contains image info
-        with open(self.csv_file, "r") as f:
-            self.images_list = [x.strip() for x in f.readlines()]
+        # images_list: List of tuple(path to img, path to gt) 
+        self.images_list = flist
 
         # Number of images in dataset
         self.len = len(self.images_list)
@@ -74,13 +74,13 @@ class MyDataset(Dataset):
         :return: return the i'th image and its label
         """
         # Image file path
-        link = self.images_list[idx].split()
+        link = self.images_list[idx]
         image_name = os.path.join(self.data_dir, link[0])
         gt_name = os.path.join(self.data_dir, link[1])
 
         # Open image
-        image = load_image(image_name)
-        label = load_label(gt_name)
+        image = Image.open(image_name).convert("RGB")
+        label = Image.open(gt_name).convert("L")
 
         # Transform
         if self.transform:
