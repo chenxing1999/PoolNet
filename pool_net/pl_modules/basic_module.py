@@ -41,17 +41,17 @@ class BasePoolNetModule(pl.LightningModule):
             "log": tensorboard_logs,
         }
 
-    def validation_step(self, batch, batch_idx):
-        x, y = batch
-        pred = self.core(x)
+    # def validation_step(self, batch, batch_idx):
+    #     x, y = batch
+    #     pred = self.core(x)
 
-        loss = self.loss_function(pred, y)
-        tensorboard_logs = {"train_loss": loss}
+    #     loss = self.loss_function(pred, y)
+    #     tensorboard_logs = {"train_loss": loss}
 
-        return {
-            "loss": loss,
-            "log": tensorboard_logs,
-        }
+    #     return {
+    #         "loss": loss,
+    #         "log": tensorboard_logs,
+    #     }
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.wd)
