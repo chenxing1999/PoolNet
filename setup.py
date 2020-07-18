@@ -20,7 +20,7 @@ setup(
     include_package_data=True,
     zip_safe=True,
     python_requires=">=3.6",
-    install_requires=[torch_urls("1.4"), "numpy"],
+    install_requires=[torch_urls("1.4"), "numpy", "pytorch-lightning"],
     extras_require={
         "dev": ["black", "pytest"],
     },
