@@ -45,7 +45,8 @@ class FeatureAggregation(nn.Module):
             y = layer(x)
 
             # Resize that output back to `x` then add to `res`
-            res += F.interpolate(
+            ## Dont use += (inplace). Tensor will be need for backward
+            res = res + F.interpolate(
                 y, x.shape[2:], mode="bilinear", align_corners=True
             )
 
