@@ -42,6 +42,8 @@ def parse_args():
     parser.add_argument("--n_gpus", default=1, type=int)
     parser.add_argument("--epochs", default=100, type=int)
 
+    parser.add_argument("--checkpoint_path", default=None)
+
     args = parser.parse_args()
 
     if args.val_root is None:
@@ -74,6 +76,7 @@ def main():
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         collate_fn=padding_collate_function,
+        shuffle=True,
     )
     val_loader = None
     val_loader = DataLoader(
@@ -85,7 +88,11 @@ def main():
 
     module = BasePoolNetModule()
 
-    trainer = pl.Trainer(max_epochs=args.epochs, gpus=args.n_gpus)
+    trainer = pl.Trainer(
+        max_epochs=args.epochs,
+        gpus=args.n_gpus,
+        resume_from_checkpoint=args.checkpoint_path,
+    )
 
     trainer.fit(module, train_loader, val_loader)
 
@@ -93,7 +100,8 @@ def main():
     timestamp = datetime.datetime.now().strftime(datetime_format)
     checkpoint_name = f"model_checkpoint_{timestamp}.cptk"
 
-    trainer.save_checkpoint(f"lightning_logs/{checkpoint_name}")
+    # trainer.save_checkpoint(f"lightning_logs/{checkpoint_name}")
+    torch.save(module.core, f"lightning_logs/{checkpoint_name}")
 
 
 if __name__ == "__main__":
