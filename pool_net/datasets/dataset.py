@@ -19,25 +19,6 @@ default_transform = transforms.Compose(
 )
 
 
-def load_image(path):
-    if os.path.exists(path):
-        logger.error(f"File {path} not exists")
-        return None
-    else:
-        im = Image.open(path).convert("RGB")
-        return im
-
-
-def load_label(path):
-    if os.path.exists(path):
-        logger.error(f"File {path} not exists")
-        return None
-    else:
-        im = Image.open(path)
-
-        return im
-
-
 class MyDataset(Dataset):
     def __init__(self, flist, data_dir, transform=default_transform):
         """
@@ -88,31 +69,3 @@ class MyDataset(Dataset):
             label = transforms.ToTensor()(label)
 
         return image, label
-
-
-def get_loader(config, mode="train", pin=False):
-    shuffle = False
-    if mode == "train":
-        shuffle = True
-        # Transform compose for training
-        transform = default_transform
-
-        data_loader = data.DataLoader(
-            dataset=myDataset(config.train_root, config.train_list, transform),
-            batch_size=config.batch_size,
-            shuffle=shuffle,
-            num_workers=config.num_thread,
-            pin_memory=pin,
-        )
-    else:
-        # Transform compose for testing
-        transform = default_transform
-
-        data_loader = data.DataLoader(
-            dataset=myDataset(config.test_root, config.test_list, transform),
-            batch_size=config.batch_size,
-            shuffle=shuffle,
-            num_workers=config.num_thread,
-            pin_memory=pin,
-        )
-    return data_loader
