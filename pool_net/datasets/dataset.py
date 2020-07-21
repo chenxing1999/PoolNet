@@ -84,8 +84,9 @@ class MyDataset(Dataset):
         # Open image
         image = Image.open(image_name).convert("RGB")
         label = Image.open(gt_name).convert("L")
-
+        
         image, label = self.random_flip(image, label)
+
 
         # Transform
         if self.transform:

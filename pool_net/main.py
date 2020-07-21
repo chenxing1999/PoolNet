@@ -67,6 +67,7 @@ def main():
     train_transform = get_train_transform()
     train_dataset = MyDataset(
         train_flist, args.train_root, transform=train_transform, p_flip=0.5
+
     )
     val_dataset = MyDataset(val_flist, args.val_root)
 
@@ -92,6 +93,7 @@ def main():
         gpus=args.n_gpus,
         resume_from_checkpoint=args.checkpoint_path,
     )
+
 
     trainer.fit(module, train_loader, val_loader)
 

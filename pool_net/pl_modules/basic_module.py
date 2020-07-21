@@ -71,6 +71,7 @@ class BasePoolNetModule(pl.LightningModule):
 
         report = self.metric_report_gpu(preds, labels)
 
+
         tensorboard_logs.update(report)
         tqdm_dict = {"v-loss": avg_loss, "f-beta": report["f-beta"]}
 
@@ -150,4 +151,3 @@ class BasePoolNetModule(pl.LightningModule):
             "f-beta": f_beta,
             "mae": mae
         }
-
