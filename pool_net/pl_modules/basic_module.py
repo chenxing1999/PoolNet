@@ -69,7 +69,8 @@ class BasePoolNetModule(pl.LightningModule):
 
         tensorboard_logs = {"val_loss": avg_loss}
 
-        report = self.metric_report(preds, labels)
+        report = self.metric_report_gpu(preds, labels)
+
 
         tensorboard_logs.update(report)
         tqdm_dict = {"v-loss": avg_loss, "f-beta": report["f-beta"]}
@@ -104,14 +105,49 @@ class BasePoolNetModule(pl.LightningModule):
         prediction[pred >= 0.5] = 1
         prediction[pred < 0.5] = 0
         report = metrics.precision_recall_fscore_support(
-            label, prediction, beta=0.3
+            label, prediction, beta=0.3, average="binary"
         )
+        # print(report)
 
         mae = np.mean(np.abs(pred - label))
+        # print(mae)
 
         return {
-            "precision": report[0][1],
-            "recall": report[1][1],
-            "f-beta": report[2][1],
+            "precision": report[0],
+            "recall": report[1],
+            "f-beta": report[2],
             "mae": mae,
+        }
+
+
+    def metric_report_gpu(self, pred, label):
+        # Convert pred and label to gpu
+        pred = torch.tensor(pred).cuda()
+        label = torch.tensor(label).long().cuda()
+
+        prediction = (pred > 0.5).long()
+
+        tp = (prediction * label).sum().to(torch.float32)
+        tn = ((1-label) * (1-prediction)).sum().to(torch.float32)
+        fp = ((1 - label) * prediction).sum().to(torch.float32)
+        fn = (label * (1-prediction)).sum().to(torch.float32)
+
+        eps = 1e-10
+
+        precision = tp / (tp + fp + eps)
+        recall = tp / (tp + fn + eps)
+
+        # Convert from gpu to cpu
+        precision = precision.item()
+        recall = recall.item()
+
+        beta = 0.3
+        f_beta = (1 + beta) * precision * recall / (beta * precision + recall)
+
+        mae = torch.abs(pred - label).mean().item()
+        return {
+            "precision": precision,
+            "recall": recall,
+            "f-beta": f_beta,
+            "mae": mae
         }

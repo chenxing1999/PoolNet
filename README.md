@@ -23,3 +23,28 @@ For modify code, please first clone this repo, then in this folder, run:
 ```
 pip install -e .[dev]
 ```
+
+## <div id="#infer"> Inference </div>
+
+First, choose model weight to download (Or train your own model).
+
+Link: TBD
+
+Example code:
+```
+from pool_net import PoolNetInterface
+
+weight_path = "path/to/model/weight.cptk"
+
+# Load model
+model = PoolNetInterface(weight_path, device="gpu")
+
+# Call function
+mask = model.process("path/to/image/file.png")
+```
+
+## <div id="#train"> Training </div>
+Tutorial in detail will be add later.
+
+
+

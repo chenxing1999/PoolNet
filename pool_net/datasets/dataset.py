@@ -3,6 +3,8 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
+from .transforms import HorizontalFlipSegmentation
+
 from PIL import Image
 import os
 
@@ -37,9 +39,8 @@ def load_label(path):
 
         return im
 
-
 class MyDataset(Dataset):
-    def __init__(self, flist, data_dir, transform=default_transform):
+    def __init__(self, flist, data_dir, transform=default_transform, p_flip=0.0):
         """
         Constructer of MyDataset
         
@@ -59,6 +60,8 @@ class MyDataset(Dataset):
 
         # The transform is going to be used on image
         self.transform = transform
+
+        self.random_flip = HorizontalFlipSegmentation(p_flip)
 
     def __len__(self):
         """
@@ -81,6 +84,9 @@ class MyDataset(Dataset):
         # Open image
         image = Image.open(image_name).convert("RGB")
         label = Image.open(gt_name).convert("L")
+        
+        image, label = self.random_flip(image, label)
+
 
         # Transform
         if self.transform:

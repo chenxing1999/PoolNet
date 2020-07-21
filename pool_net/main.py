@@ -21,7 +21,6 @@ from torchvision import transforms
 def get_train_transform():
     return transforms.Compose(
         [
-            transforms.RandomHorizontalFlip(0.5),
             transforms.ToTensor(),
             transforms.Normalize(
                 mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -41,6 +40,8 @@ def parse_args():
     parser.add_argument("--num_workers", default=4, type=int)
     parser.add_argument("--n_gpus", default=1, type=int)
     parser.add_argument("--epochs", default=100, type=int)
+
+    parser.add_argument("--checkpoint_path", default=None)
 
     args = parser.parse_args()
 
@@ -65,7 +66,8 @@ def main():
 
     train_transform = get_train_transform()
     train_dataset = MyDataset(
-        train_flist, args.train_root, transform=train_transform
+        train_flist, args.train_root, transform=train_transform, p_flip=0.5
+
     )
     val_dataset = MyDataset(val_flist, args.val_root)
 
@@ -74,6 +76,7 @@ def main():
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         collate_fn=padding_collate_function,
+        shuffle=True,
     )
     val_loader = None
     val_loader = DataLoader(
@@ -85,7 +88,12 @@ def main():
 
     module = BasePoolNetModule()
 
-    trainer = pl.Trainer(max_epochs=args.epochs, gpus=args.n_gpus)
+    trainer = pl.Trainer(
+        max_epochs=args.epochs,
+        gpus=args.n_gpus,
+        resume_from_checkpoint=args.checkpoint_path,
+    )
+
 
     trainer.fit(module, train_loader, val_loader)
 
@@ -93,7 +101,8 @@ def main():
     timestamp = datetime.datetime.now().strftime(datetime_format)
     checkpoint_name = f"model_checkpoint_{timestamp}.cptk"
 
-    trainer.save_checkpoint(f"lightning_logs/{checkpoint_name}")
+    # trainer.save_checkpoint(f"lightning_logs/{checkpoint_name}")
+    torch.save(module.core, f"lightning_logs/{checkpoint_name}")
 
 
 if __name__ == "__main__":
