@@ -40,7 +40,7 @@ def load_label(path):
         return im
 
 class MyDataset(Dataset):
-    def __init__(self, flist, data_dir, transform=default_transform, p_flip=0.5):
+    def __init__(self, flist, data_dir, transform=default_transform, p_flip=0.0):
         """
         Constructer of MyDataset
         

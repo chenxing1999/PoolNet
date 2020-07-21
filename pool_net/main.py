@@ -66,7 +66,7 @@ def main():
 
     train_transform = get_train_transform()
     train_dataset = MyDataset(
-        train_flist, args.train_root, transform=train_transform
+        train_flist, args.train_root, transform=train_transform, p_flip=0.5
     )
     val_dataset = MyDataset(val_flist, args.val_root)
 

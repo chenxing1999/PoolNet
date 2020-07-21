@@ -8,7 +8,7 @@ class HorizontalFlipSegmentation():
     def __call__(self, img, mask):
         c_p = random.random()
 
-        if c_p < p:
+        if c_p < self.p:
             return img, mask
 
         img = ImageOps.mirror(img)
