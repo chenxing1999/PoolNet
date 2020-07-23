@@ -12,13 +12,16 @@ import numpy as np
 class BasePoolNetModule(pl.LightningModule):
     def __init__(self, lr=5e-5, wd=0.0005, **kwargs):
         super(BasePoolNetModule, self).__init__()
-        self.core = VggPoolNet()
+        self.core = self.build_model()
 
         self.loss_ = nn.BCEWithLogitsLoss()
 
         # Optimizer parameters
         self.lr = lr
         self.wd = wd
+
+    def build_model(self):
+        return VggPoolNet()
 
     def forward(self, x):
         """
