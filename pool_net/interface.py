@@ -11,7 +11,6 @@ class PoolNetInterface(object):
         self,
         weight_paths,
         device="gpu",
-        use_edge=False,
         *,
         transform=default_transform,
         prefix="core."
@@ -25,10 +24,6 @@ class PoolNetInterface(object):
             prefix(str): State dict key prefix
         """
         self._device = self.get_device(device)
-        if use_edge:
-            self._core = VggPoolNetEdge()
-        else:
-            self._core = VggPoolNet()
         self._transform = transform
 
         self.load_weight(weight_paths, prefix=prefix)
@@ -49,6 +44,12 @@ class PoolNetInterface(object):
         """
         checkpoint = torch.load(weight_paths, map_location="cpu")
         state_dict = checkpoint["state_dict"]
+        use_edge = checkpoint.get("use_edge", False)
+
+        if use_edge:
+            self._core = VggPoolNetEdge()
+        else:
+            self._core = VggPoolNet()
 
         if prefix is None or len(prefix) == 0:
             self._core.load_state_dict(state_dict)

@@ -29,3 +29,7 @@ class EdgePoolNetModule(BasePoolNetModule):
             "loss": loss,
             "log": tensorboard_logs,
         }
+
+    def on_save_checkpoint(self, checkpoint):
+        super(EdgePoolNetModule, self).on_save_checkpoint(checkpoint)
+        checkpoint["use_edge"] = True
