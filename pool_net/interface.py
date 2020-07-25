@@ -1,5 +1,5 @@
 import torch
-from pool_net.models.poolnet import VggPoolNet
+from pool_net.models.poolnet import VggPoolNet, VggPoolNetEdge
 from pool_net.datasets.dataset import default_transform
 
 from PIL import Image
@@ -11,6 +11,7 @@ class PoolNetInterface(object):
         self,
         weight_paths,
         device="gpu",
+        use_edge=False,
         *,
         transform=default_transform,
         prefix="core."
@@ -24,7 +25,10 @@ class PoolNetInterface(object):
             prefix(str): State dict key prefix
         """
         self._device = self.get_device(device)
-        self._core = VggPoolNet()
+        if use_edge:
+            self._core = VggPoolNetEdge()
+        else:
+            self._core = VggPoolNet()
         self._transform = transform
 
         self.load_weight(weight_paths, prefix=prefix)
