@@ -28,7 +28,7 @@ pip install -e .[dev]
 
 First, choose model weight to download (Or train your own model).
 
-Link: TBD
+[Link](https://drive.google.com/drive/folders/1SEfT66id2yIPFhqN-1d7KFvD7mg517Fc?usp=sharing)
 
 Example code:
 ```
@@ -44,7 +44,42 @@ mask = model.process("path/to/image/file.png")
 ```
 
 ## <div id="#train"> Training </div>
-Tutorial in detail will be add later.
+To train in normal mode, please download data from original repos.
+
+The csv file should have format:
+```
+path/to/img0.jpg path/to/gt0.png
+path/to/img1.jpg path/to/gt1.png
+path/to/img2.jpg path/to/gt2.png
+```
+
+To train, you need to cd to `pool_net` folder, and call `main.py`.
+
+Example:
+```
+python main.py --train_root /path/to/train/folder/root \
+    --train_csv_file /path/to/train.csv \
+    --batch_size 8 \
+    --val_csv_file /path/to/val.csv \
+    --epochs 40 \
+    --n_gpus 1 
+```
 
 
+To train in edge mode, your csv should have format like below:
+```
+path/to/img0.jpg path/to/gt0.png path/to/edge_gt0.png
+path/to/img1.jpg path/to/gt1.png path/to/edge_gt1.png
+path/to/img2.jpg path/to/gt2.png path/to/edge_gt2.png
+```
+
+Then call the `edge_main.py` in `pool_net` like this example:
+```
+python edge_main.py --train_root /path/to/train/folder/root \
+    --train_csv_file /path/to/train.csv \
+    --batch_size 8 \
+    --val_csv_file /path/to/val.csv \
+    --epochs 40 \
+    --n_gpus 1 
+```
 
