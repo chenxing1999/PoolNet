@@ -10,15 +10,18 @@ import numpy as np
 
 
 class BasePoolNetModule(pl.LightningModule):
-    def __init__(self, lr=5e-5, wd=0.0005, **kwargs):
+    def __init__(self, lr=5e-5, wd=0.0005, reduction="mean", **kwargs):
         super(BasePoolNetModule, self).__init__()
-        self.core = VggPoolNet()
+        self.core = self.build_model()
 
-        self.loss_ = nn.BCEWithLogitsLoss()
+        self.loss_ = nn.BCEWithLogitsLoss(reduction=reduction)
 
         # Optimizer parameters
         self.lr = lr
         self.wd = wd
+
+    def build_model(self):
+        return VggPoolNet()
 
     def forward(self, x):
         """
@@ -80,6 +83,45 @@ class BasePoolNetModule(pl.LightningModule):
             "log": tensorboard_logs,
             "progress_bar": tqdm_dict,
         }
+
+    ### Test step is the same as val step
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        preds = self.core(x)
+
+        loss = self.loss_function(preds, y)
+
+        labels = y.cpu().long().numpy().flatten()
+        labels = np.array(labels, dtype=np.uint8)
+
+        preds = F.sigmoid(preds)
+        preds = preds.cpu().numpy().flatten()
+
+        return {"val_loss": loss, "labels": labels, "preds": preds}
+
+    def test_epoch_end(self, outputs):
+        avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
+
+        labels = [x["labels"] for x in outputs]
+        preds = [x["preds"] for x in outputs]
+
+        labels = np.concatenate(labels)
+        preds = np.concatenate(preds)
+
+        tensorboard_logs = {"val_loss": avg_loss}
+
+        report = self.metric_report_gpu(preds, labels)
+
+
+        tensorboard_logs.update(report)
+        tqdm_dict = {"v-loss": avg_loss, "f-beta": report["f-beta"]}
+
+        return {
+            "val_loss": avg_loss,
+            "log": tensorboard_logs,
+            "progress_bar": tqdm_dict,
+        }
+    ######################################################
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(
@@ -151,3 +193,6 @@ class BasePoolNetModule(pl.LightningModule):
             "f-beta": f_beta,
             "mae": mae
         }
+
+    def on_save_checkpoint(self, checkpoint):
+        checkpoint["use_edge"] = False

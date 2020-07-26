@@ -9,6 +9,7 @@ from PIL import Image
 import os
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -16,7 +17,9 @@ default_transform = transforms.Compose(
     [
         # transforms.Resize((224, 224)),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        ),
     ]
 )
 
@@ -39,20 +42,30 @@ def load_label(path):
 
         return im
 
+
 class MyDataset(Dataset):
-    def __init__(self, flist, data_dir, transform=default_transform, p_flip=0.0):
+    def __init__(
+        self,
+        flist,
+        data_dir,
+        transform=default_transform,
+        p_flip=0.0,
+        load_edge=False,
+    ):
         """
         Constructer of MyDataset
         
         :param flist: List of image file name and ground truth tuple
         :param data_dir: directory of folder containing all images
         :param transform: transform function will be used on images
+        :param p_flip: Random horizontal flip probility
+        :param load_edge: Load ground truth edge image
         :return: returns nothing
         """
         # Image directory
         self.data_dir = data_dir
 
-        # images_list: List of tuple(path to img, path to gt) 
+        # images_list: List of tuple(path to img, path to gt)
         self.images_list = flist
 
         # Number of images in dataset
@@ -62,6 +75,9 @@ class MyDataset(Dataset):
         self.transform = transform
 
         self.random_flip = HorizontalFlipSegmentation(p_flip)
+        self.load_edge = load_edge
+
+        self.to_tensor = transforms.ToTensor()
 
     def __len__(self):
         """
@@ -84,14 +100,25 @@ class MyDataset(Dataset):
         # Open image
         image = Image.open(image_name).convert("RGB")
         label = Image.open(gt_name).convert("L")
-        
-        image, label = self.random_flip(image, label)
 
+        if self.load_edge:
+            edge_path = os.path.join(self.data_dir, link[2])
+            edge = Image.open(edge_path).convert("L")
+
+            image, label, edge = self.random_flip(image, label, edge)
+
+        else:
+            image, label = self.random_flip(image, label)
 
         # Transform
         if self.transform:
             image = self.transform(image)
-            label = transforms.ToTensor()(label)
+            label = self.to_tensor(label)
+
+        if self.load_edge:
+            edge = self.to_tensor(edge)
+            return image, label, edge
+
 
         return image, label
 
