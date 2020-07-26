@@ -83,3 +83,9 @@ python edge_main.py --train_root /path/to/train/folder/root \
     --n_gpus 1 
 ```
 
+To view tensorboard, call:
+```
+tensorboard --logdir lightning_logs/
+```
+
+Your model weight will be saved under: `lightning_logs/version_<your version>/checkpoints/`
