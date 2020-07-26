@@ -41,6 +41,8 @@ def parse_args():
     parser.add_argument("--n_gpus", default=1, type=int)
     parser.add_argument("--epochs", default=100, type=int)
 
+    parser.add_argument("--accum", default=1, type=int, help="accumulate_grad_batches")
+
     parser.add_argument("--checkpoint_path", default=None)
 
     args = parser.parse_args()
@@ -84,7 +86,7 @@ def main():
     val_loader = None
     val_loader = DataLoader(
         val_dataset,
-        batch_size=args.batch_size,
+        batch_size=4,
         num_workers=args.num_workers,
         collate_fn=padding_collate_function,
     )
@@ -95,6 +97,7 @@ def main():
         max_epochs=args.epochs,
         gpus=args.n_gpus,
         resume_from_checkpoint=args.checkpoint_path,
+        accumulate_grad_batches=args.accum,
     )
 
     trainer.fit(module, train_loader, val_loader)
@@ -104,7 +107,7 @@ def main():
     checkpoint_name = f"model_checkpoint_{timestamp}.cptk"
 
     # trainer.save_checkpoint(f"lightning_logs/{checkpoint_name}")
-    torch.save(module.core, f"lightning_logs/{checkpoint_name}")
+    # torch.save(module.core.state_dict(), f"lightning_logs/{checkpoint_name}")
 
 
 if __name__ == "__main__":

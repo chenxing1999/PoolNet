@@ -10,11 +10,11 @@ import numpy as np
 
 
 class BasePoolNetModule(pl.LightningModule):
-    def __init__(self, lr=5e-5, wd=0.0005, **kwargs):
+    def __init__(self, lr=5e-5, wd=0.0005, reduction="mean", **kwargs):
         super(BasePoolNetModule, self).__init__()
         self.core = self.build_model()
 
-        self.loss_ = nn.BCEWithLogitsLoss()
+        self.loss_ = nn.BCEWithLogitsLoss(reduction=reduction)
 
         # Optimizer parameters
         self.lr = lr
