@@ -16,7 +16,7 @@ First, follow the tutorial in [link](https://pytorch.org/) to install PyTorch.
 For inference only install:
 ``` shell
 # Install master (unstable)
-pip install lib-poolnet@git+ssh://git@github.com:xing1999/PoolNet@master
+pip install git+ssh://git@github.com/xing1999/PoolNet@v.0.1.0
 ```
 
 For modify code, please first clone this repo, then in this folder, run:
